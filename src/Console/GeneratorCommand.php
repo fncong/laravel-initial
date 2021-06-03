@@ -2,9 +2,7 @@
 
 namespace Fncong\LaravelInitial\Console;
 
-use App\Http\Controllers\Admin\AdminBaseController;
 use App\Http\Controllers\Controller;
-use App\Http\Services\BaseService;
 use App\Http\Validators\BaseValidator;
 use Illuminate\Console\Command;
 use Illuminate\Http\Request;
@@ -57,7 +55,7 @@ class GeneratorCommand extends Command
 
     public function apiController($namespace_service, $namespace_validator)
     {
-        $this->info('Controller 生成');
+        $this->info('ApiController 生成');
         $namespace_controller = new PhpNamespace("App\\Http\\Controllers\\Api");
         $namespace_controller->addUse(Controller::class);
         $namespace_controller->addUse(Request::class);
@@ -74,9 +72,9 @@ $this->middleware(\'auth:sanctum\');
 
 
         $index_method = $controller_class->addMethod('index');
-        $store_body = '$query = $this->request->only([]);
-$this->validator(' . $this->model . 'Validator::class, $query, "api-index");
-return success("", $service->index($query));
+        $store_body = '$params = $this->request->only([]);
+$this->validator(' . $this->model . 'Validator::class, $params, "api-index");
+return success("", $service->index($params));
 ';
         $index_method->setBody($store_body);
         $index_method->addParameter('service')->setType($namespace_service->getName() . '\\' . $this->model . 'Service');
@@ -96,7 +94,7 @@ return success("", $service->index($query));
 
     public function adminController($namespace_service, $namespace_validator)
     {
-        $this->info('Controller 生成');
+        $this->info('AdminController 生成');
         $namespace_controller = new PhpNamespace("App\\Http\\Controllers\\Admin");
         $namespace_controller->addUse(Controller::class);
         $namespace_controller->addUse(Request::class);
@@ -113,9 +111,9 @@ $this->middleware(\'auth:sanctum\');
 
 
         $index_method = $controller_class->addMethod('index');
-        $store_body = '$query = $this->request->only([]);
-$this->validator(' . $this->model . 'Validator::class, $query, "api-index");
-return success(\'\', $service->index($query));
+        $store_body = '$params = $this->request->only([]);
+$this->validator(' . $this->model . 'Validator::class, $params, "api-index");
+return success(\'ok\', $service->index($params));
 ';
         $index_method->setBody($store_body);
         $index_method->addParameter('service')->setType($namespace_service->getName() . '\\' . $this->model . 'Service');
@@ -123,15 +121,15 @@ return success(\'\', $service->index($query));
         $show_method = $controller_class->addMethod('show');
         $show_method->addParameter('service')->setType($namespace_service->getName() . '\\' . $this->model . 'Service');
         $show_method->addParameter('id');
-        $show_method->setBody('return success(\'\', $service->show($id));');
+        $show_method->setBody('return success(\'ok\', $service->show($id));');
 
         $create_method = $controller_class->addMethod('create');
         $create_method->addParameter('service')->setType($namespace_service->getName() . '\\' . $this->model . 'Service');
 
         $store_method = $controller_class->addMethod('store');
-        $store_body = '$data = $this->request->post();
-$this->validator(' . $this->model . 'Validator::class, $data, \'store\');
-return success(\'\', $service->store($data));
+        $store_body = '$params = $this->request->only([]);
+$this->validator(' . $this->model . 'Validator::class, $params, \'store\');
+return success(\'新增成功\', $service->store($params));
 ';
         $store_method->setBody($store_body);
         $store_method->addParameter('service')
@@ -142,16 +140,16 @@ return success(\'\', $service->store($data));
         $edit_method->addParameter('service')->setType($namespace_service->getName() . '\\' . $this->model . 'Service');
 
         $update_method = $controller_class->addMethod('update');
-        $update_body = '$data = $this->request->input();
-$this->validator(' . $this->model . 'Validator::class, $data, \'update\');
-return success(\'\', $service->update($id,$data));
+        $update_body = '$params = $this->request->only([]);
+$this->validator(' . $this->model . 'Validator::class, $params, \'update\');
+return success(\'修改成功\', $service->update($id,$params));
 ';
         $update_method->setBody($update_body);
         $update_method->addParameter('service')->setType($namespace_service->getName() . '\\' . $this->model . 'Service');
         $update_method->addParameter('id');
 
 
-        $destroy_body = 'return success(\'\', $service->destroy($id));';
+        $destroy_body = 'return success(\'删除成功\', $service->destroy($id));';
         $destroy_method = $controller_class->addMethod('destroy');
         $destroy_method->setBody($destroy_body);
         $destroy_method->addParameter('service')->setType($namespace_service->getName() . '\\' . $this->model . 'Service');
@@ -170,9 +168,21 @@ return success(\'\', $service->update($id,$data));
         $this->info('ApiService 生成');
         $namespace_service = new PhpNamespace("App\\Http\\Services\\Api");
         $class = new ClassType($this->model . 'Service');
-        $class->addExtend(BaseService::class);
+        $class->addExtend("App\\Http\\Services\\BaseService");
+        $namespace_service->addUse("App\\Models\\{$this->model}");
         $namespace_service->add($class);
-        $namespace_service->addUse(BaseService::class);
+        $namespace_service->addUse("App\\Http\\Services\\BaseService");
+
+        $method = $class->addMethod('index');
+        $method->addParameter('params')->setType('array');
+        $method->addBody("return {$this->model}::query()->orderByDesc('id')->paginate();");
+
+
+        $method = $class->addMethod('show');
+        $method->addParameter('id');
+        $method->addBody("return {$this->model}::query()->where('id',\$id)->firstOrFail();");
+
+
         $file_name = "Http/Services/Api/{$this->model}Service.php";
         $this->put($file_name, $namespace_service);
         return $namespace_service;
@@ -183,9 +193,33 @@ return success(\'\', $service->update($id,$data));
         $this->info('AdminService 生成');
         $namespace_service = new PhpNamespace("App\\Http\\Services\\Admin");
         $class = new ClassType($this->model . 'Service');
-        $class->addExtend(BaseService::class);
+        $class->addExtend("App\\Http\\Services\\BaseService");
+        $namespace_service->addUse("App\\Models\\{$this->model}");
         $namespace_service->add($class);
-        $namespace_service->addUse(BaseService::class);
+        $namespace_service->addUse("App\\Http\\Services\\BaseService");
+
+        $method = $class->addMethod('index');
+        $method->addParameter('params')->setType('array');
+        $method->addBody("return {$this->model}::query()->orderByDesc('id')->paginate();");
+
+
+        $method = $class->addMethod('show');
+        $method->addParameter('id');
+        $method->addBody("return {$this->model}::query()->where('id',\$id)->firstOrFail();");
+
+        $method = $class->addMethod('store');
+        $method->addParameter('params')->setType('array');
+        $method->addBody("return true;");
+
+        $method = $class->addMethod('update');
+        $method->addParameter('id');
+        $method->addParameter('params')->setType('array');
+        $method->addBody("return {$this->model}::query()->create(\$params);");
+
+        $method = $class->addMethod('destroy');
+        $method->addParameter('id');
+        $method->addBody("return true;");
+
         $file_name = "Http/Services/Admin/{$this->model}Service.php";
         $this->put($file_name, $namespace_service);
         return $namespace_service;
