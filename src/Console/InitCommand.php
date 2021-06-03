@@ -28,25 +28,23 @@ class InitCommand extends Command
      */
     public function handle()
     {
-        if (!mkdir($concurrentDirectory = app_path("Http/Enums")) && !is_dir($concurrentDirectory)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
-        }
-        if (!mkdir($concurrentDirectory = app_path("Http/Services")) && !is_dir($concurrentDirectory)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
-        }
-        if (!mkdir($concurrentDirectory = app_path("Http/Validators")) && !is_dir($concurrentDirectory)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
-        }
-        if (!mkdir($concurrentDirectory = app_path("Http/Controllers/Api")) && !is_dir($concurrentDirectory)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
-        }
-        if (!mkdir($concurrentDirectory = app_path("Http/Controllers/Admin")) && !is_dir($concurrentDirectory)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
-        }
-        if (!mkdir($concurrentDirectory = app_path('Libraries')) && !is_dir($concurrentDirectory)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
-        }
-
+        $this->initialDirs();
         return 0;
+    }
+
+    public function initialDirs()
+    {
+        $dirs = ['Http/Enums', 'Http/Services', 'Http/Validators', 'Http/Controllers/Api', 'Http/Controllers/Admin', 'Libraries'];
+        foreach ($dirs as $index => $dir) {
+            $concurrentDirectory = app_path($dir);
+            if (is_dir($concurrentDirectory)) {
+                $this->output->warning($concurrentDirectory . ' 目录已经存在');
+            } else {
+                if (!mkdir($concurrentDirectory) && !is_dir($concurrentDirectory)) {
+                    throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+                }
+                $this->output->success($concurrentDirectory . ' 已经创建');
+            }
+        }
     }
 }

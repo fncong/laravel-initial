@@ -8,11 +8,11 @@
         }
     ],
     "require": {
-        "illuminate/container": "^8.0"
+        "illuminate/container": "^8.0",
+        "nette/php-generator": "^3.5"
     },
     "require-dev": {
-        "laravel/framework": "^8.5",
-        "nette/php-generator": "^3.5"
+        "laravel/framework": "^8.5"
     },
     "autoload": {
         "psr-4": {
