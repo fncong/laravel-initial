@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Fncong\LaravelInitial\Console;
 
 use Illuminate\Console\Command;
 

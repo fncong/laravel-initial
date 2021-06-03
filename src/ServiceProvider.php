@@ -1,10 +1,9 @@
 <?php
 
 
-namespace Overtrue\LaravelWeChat;
+namespace Fncong\LaravelInitial;
 
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
-
 
 class ServiceProvider extends LaravelServiceProvider
 {
@@ -15,7 +14,7 @@ class ServiceProvider extends LaravelServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                FooCommand::class,
+                \Fncong\LaravelInitial\Console\InitCommand::class,
             ]);
         }
     }
