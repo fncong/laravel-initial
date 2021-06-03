@@ -7,6 +7,7 @@
             "email": "fncong@outlook.com"
         }
     ],
+    "license": "MIT",
     "require": {
         "illuminate/container": "^8.0",
         "nette/php-generator": "^3.5"
