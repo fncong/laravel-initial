@@ -1,0 +1,28 @@
+{
+    "name": "fncong/laravel-initial",
+    "description": "自用",
+    "authors": [
+        {
+            "name": "fncong",
+            "email": "fncong@outlook.com"
+        }
+    ],
+    "require": {
+        "illuminate/container": "^8.0"
+    },
+    "require-dev": {
+        "laravel/framework": "^8.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Fncong\\LaravelInitial\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Fncong\\LaravelInitial\\ServiceProvider"
+            ]
+        }
+    }
+}
