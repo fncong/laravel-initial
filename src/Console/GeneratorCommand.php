@@ -112,7 +112,7 @@ $this->middleware(\'auth:sanctum\');
 
         $index_method = $controller_class->addMethod('index');
         $store_body = '$params = $this->request->only([]);
-$this->validator(' . $this->model . 'Validator::class, $params, "api-index");
+$this->validator(' . $this->model . 'Validator::class, $params, "admin-index");
 return success(\'ok\', $service->index($params));
 ';
         $index_method->setBody($store_body);
@@ -128,7 +128,7 @@ return success(\'ok\', $service->index($params));
 
         $store_method = $controller_class->addMethod('store');
         $store_body = '$params = $this->request->only([]);
-$this->validator(' . $this->model . 'Validator::class, $params, \'store\');
+$this->validator(' . $this->model . 'Validator::class, $params, \'admin-store\');
 return success(\'新增成功\', $service->store($params));
 ';
         $store_method->setBody($store_body);
@@ -141,7 +141,7 @@ return success(\'新增成功\', $service->store($params));
 
         $update_method = $controller_class->addMethod('update');
         $update_body = '$params = $this->request->only([]);
-$this->validator(' . $this->model . 'Validator::class, $params, \'update\');
+$this->validator(' . $this->model . 'Validator::class, $params, \'admin-update\');
 return success(\'修改成功\', $service->update($id,$params));
 ';
         $update_method->setBody($update_body);
